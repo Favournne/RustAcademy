@@ -329,6 +329,26 @@ export class AuthSessionService {
   private userSessionsKey(userId: string): string {
     return userSessions:${userId};
   }
+    
+  async validateAccessSession(sessionId: string): Promise<Session> {
+  const session = await this.getSession(sessionId);
+
+  if (!session || session.revoked) {
+    throw new UnauthorizedException({
+      error: 'SESSION_REVOKED',
+      message: 'Session has been revoked or does not exist',
+    });
+  }
+
+  if (session.expiresAt <= new Date()) {
+    throw new UnauthorizedException({
+      error: 'SESSION_EXPIRED',
+      message: 'Session has expired',
+    });
+  }
+
+  return session;
+}
 
   private async getSession(sessionId: string): Promise<Session | null> {
     const data = await this.rds.get(this.sessionKey(sessionId));
