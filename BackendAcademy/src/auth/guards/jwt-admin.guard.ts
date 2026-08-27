@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { UserRole } from '../enums/user-role.enum';
-
+import { AuthSessionService } from '../auth-session.service';
 /**
  * Protects routes that require a valid admin JWT.
  *
@@ -20,7 +20,8 @@ import { UserRole } from '../enums/user-role.enum';
  */
 @Injectable()
 export class JwtAdminGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(private readonly jwtService: JwtService,
+              private readonly authSessionService: AuthSessionService,) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -42,6 +43,8 @@ export class JwtAdminGuard implements CanActivate {
         message: 'Token is invalid or has expired',
       });
     }
+
+    await this.authSessionService.validateAccessSession(payload.sessionId);
 
     if (payload.role !== UserRole.ADMIN) {
       throw new ForbiddenException({
