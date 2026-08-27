@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnboardingService } from '../onboarding/onboarding.service';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { SocialService } from '../social/social.service';
+import { AuthSessionService } from '../auth/auth-session.service';
 
 export interface UserPreferencesDto {
   learnerPreferences?: Record<string, unknown>;
@@ -71,6 +72,7 @@ export class UsersService {
     private readonly onboardingService: OnboardingService,
     private readonly analyticsService: AnalyticsService,
     private readonly socialService: SocialService,
+    private readonly authSessionService: AuthSessionService,
   ) {}
 
   async updatePreferences(
@@ -220,6 +222,8 @@ export class UsersService {
       `onboarding=${result.onboardingDeleted}, analytics=${result.analyticsEventsDeleted}, ` +
       `social=${result.socialActivityDeleted}`,
     );
+
+    await this.authSessionService.revokeAllUserSessions(userId);
 
     return result;
   }
