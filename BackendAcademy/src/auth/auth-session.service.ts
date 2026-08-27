@@ -352,7 +352,7 @@ export class AuthSessionService {
     role: UserRole,
     sessionId: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const accessPayload: JwtPayload = { sub: userId, role };
+    const accessPayload: JwtPayload = { sub: userId, role, sessionId, };
     const refreshPayload: RefreshTokenPayload = { sub: userId, role, sessionId };
 
     const [accessToken, refreshToken] = await Promise.all([
