@@ -4,6 +4,7 @@ import { AnalyticsService } from '../analytics/analytics.service';
 import { SocialService } from '../social/social.service';
 import { AuthSessionService } from '../auth/auth-session.service';
 
+
 export interface UserPreferencesDto {
   learnerPreferences?: Record<string, unknown>;
   tutorPreferences?: Record<string, unknown>;
@@ -119,6 +120,7 @@ export class UsersService {
     this.logger.warn(
       `User ${userId} privilege changed from ${previousRole} to ${newRole} by ${changedBy}`,
     );
+    await this.authSessionService.revokeAllUserSessions(userId);
   }
 
   getPrivilegeChangeLog(userId?: string): UserPrivilegeChangeEvent[] {
